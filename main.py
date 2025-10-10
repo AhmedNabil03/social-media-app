@@ -1,7 +1,6 @@
 from fastapi import FastAPI
+from routes import base_router
 
 app = FastAPI()
 
-@app.get("/welcome")
-def welcome():
-    return {"message": "Welcome to Social Media App!"}
+app.include_router(base_router)

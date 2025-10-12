@@ -10,16 +10,29 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Starting application...")
-    
-    settings = get_settings()
-    
-    create_database(settings.SERVER_URL)
-    run_migrations()
+    try:
+        logger.info("Starting application...")
+        
+        settings = get_settings()
+        logger.info(f"Database host: {settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}")
+        
+        create_database(settings.SERVER_URL, settings.POSTGRES_MAIN_DATABASE)
+        run_migrations(settings.DATABASE_URL)
+
+        logger.info("Application startup complete")
+
+    except Exception as e:
+        logger.critical(f"Error during startup: {e}")
+        raise e
     
     yield
     
-    logger.info("Shutting down application...")
+    try:
+        logger.info("Shutting down application...")
+        logger.info("Application shutdown complete")
+        
+    except Exception as e:
+        logger.error(f"Error during shutdown: {e}")
 
 app = FastAPI(
     title="Social Media App",

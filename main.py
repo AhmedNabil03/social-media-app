@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from helpers.config import get_settings
-from routes import base_router
+from routes import base_router, user_router
 from models.init_db import create_database, run_migrations
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -51,3 +51,4 @@ app = FastAPI(
 )
 
 app.include_router(base_router)
+app.include_router(user_router)

@@ -6,5 +6,5 @@ base_router = APIRouter(
 )
 
 @base_router.get("/welcome")
-def welcome():
+async def welcome():
     return {"message": "Welcome to Social Media App!"}

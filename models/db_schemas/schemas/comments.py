@@ -26,7 +26,7 @@ class Comment(SQLAlchemyBase, TimestampMixin):
 
     __table_args__ = (
         Index('idx_comment_uuid', 'comment_uuid'),
-        Index('idx_user_id', 'user_id'),
-        Index('idx_post_id', 'post_id'),
-        Index('idx_parent_comment_id', 'parent_comment_id'),
+        Index('idx_comment_user_id', 'user_id'),
+        Index('idx_comment_post_id', 'post_id'),
+        Index('idx_comment_parent_comment_id', 'parent_comment_id'),
     )

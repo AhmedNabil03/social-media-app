@@ -22,7 +22,7 @@ class Post(SQLAlchemyBase, TimestampMixin):
     comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
 
     __table_args__ = (
-        Index('idx_user_id', 'user_id'),
+        Index('idx_post_user_id', 'user_id'),
         Index('idx_post_uuid', 'post_uuid'),
-        Index('idx_created_at', 'created_at'),
+        Index('idx_post_created_at', 'created_at'),
     )

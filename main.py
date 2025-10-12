@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from helpers.config import get_settings
 from routes import base_router
-from models.init_db import create_database, generate_migrations, run_migrations
+from models.init_db import create_database, run_migrations
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -17,7 +17,6 @@ async def lifespan(app: FastAPI):
         logger.info(f"Database host: {settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}")
 
         create_database(server_url=settings.SERVER_URL, db_name=settings.POSTGRES_MAIN_DATABASE)
-        generate_migrations(db_url=settings.DATABASE_URL)
         run_migrations(db_url=settings.DATABASE_URL)
         
         logger.info("Application startup complete")

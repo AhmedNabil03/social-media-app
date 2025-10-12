@@ -41,35 +41,6 @@ def create_database(server_url: str, db_name: str) -> bool:
         logger.critical(f"Error creating database: {e}")
         return False
 
-def generate_migrations(db_url: str, message: str = "Auto-generated migration") -> bool:
-    base_dir = os.path.dirname(__file__)
-    migrations_dir = os.path.join(base_dir, "db_schemas", "alembic")
-    alembic_ini_path = os.path.join(base_dir, "db_schemas", "alembic.ini")
-    
-    if not os.path.exists(migrations_dir):
-        logger.error(f"Migrations directory not found at: {migrations_dir}")
-        return False
-    
-    if not os.path.exists(alembic_ini_path):
-        logger.error(f"alembic.ini not found at: {alembic_ini_path}")
-        return False
-    
-    config = Config(alembic_ini_path)
-    config.set_main_option("sqlalchemy.url", db_url)
-    config.set_main_option("script_location", migrations_dir)
-    
-    logger.info(f"Generating migration: '{message}'")
-    
-    try:
-        command.revision(config, autogenerate=False, message=message)
-    except Exception as e:
-        logger.error(f"Error generating migration: {e}")
-        return False
-
-    logger.info("Migration generated successfully")
-    
-    return True
-
 def run_migrations(db_url: str) -> bool:
     base_dir = os.path.dirname(__file__)
     migrations_dir = os.path.join(base_dir, "db_schemas", "alembic")

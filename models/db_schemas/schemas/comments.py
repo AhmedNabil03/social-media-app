@@ -21,7 +21,7 @@ class Comment(SQLAlchemyBase, TimestampMixin):
     # Relationships
     user = relationship("User", back_populates="comments")
     post = relationship("Post", back_populates="comments")
-    replies = relationship("Comment", back_populates="parent", cascade="all, delete-orphan", remote_side=[id])
+    replies = relationship("Comment", back_populates="parent", remote_side=[id])
     parent = relationship("Comment", back_populates="replies", remote_side=[parent_comment_id], foreign_keys=[parent_comment_id])
 
     __table_args__ = (

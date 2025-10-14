@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from models.BaseModel import BaseModel
-from models.db_schemas.schemas.users import User
+from models.db_schemas.schemas.user import User
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,13 +9,7 @@ logger = logging.getLogger(__name__)
 
 class UserModel(BaseModel):
     
-    async def create_user(self, 
-                          username: str, 
-                          email: str, 
-                          hashed_password: str, 
-                          salt: str, 
-                          bio: str = None
-                    ) -> User:
+    async def create_user(self, username: str, email: str, hashed_password: str, salt: str, bio: str = None) -> User | None:
         try:
             async with self.db_client() as session:
                 user = User(
@@ -55,3 +49,18 @@ class UserModel(BaseModel):
         except Exception as e:
             logger.error(f"Error getting user by id: {e}")
             return None
+    
+    async def delete_user(self, user_id: int) -> bool:
+        try:
+            async with self.db_client() as session:
+                user = await session.get(User, user_id)
+                if not user:
+                    logger.warning(f"User not found: {user_id}")
+                    return False
+                await session.delete(user)
+                await session.commit()
+                logger.info(f"User deleted: {user_id}")
+                return True
+        except Exception as e:
+            logger.error(f"Error deleting user: {e}")
+            return False

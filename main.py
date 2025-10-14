@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from helpers.config import get_settings
-from routes import base_router, user_router
+from routes import base_router, user_router, post_router, like_router, comment_router, follow_router
 from models.init_db import create_database, run_migrations
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -16,12 +16,13 @@ async def lifespan(app: FastAPI):
         logger.info("Starting application...")
         
         settings = get_settings()
-        logger.info(f"Database host: {settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}")
-
-        create_database(server_url=settings.SERVER_URL, db_name=settings.POSTGRES_MAIN_DATABASE)
-        run_migrations(db_url=settings.DATABASE_URL)
         
-        logger.info("Application started and database initialized")
+        # logger.info(f"Database host: {settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}")
+
+        # create_database(server_url=settings.SERVER_URL, db_name=settings.POSTGRES_MAIN_DATABASE)
+        # run_migrations(db_url=settings.DATABASE_URL)
+        
+        # logger.info("Application started and database initialized")
         
         app.db_engine = create_async_engine(settings.DATABASE_ASYNC_URL, echo=False)
         app.db_client = sessionmaker(app.db_engine, class_=AsyncSession, expire_on_commit=False)
@@ -52,3 +53,7 @@ app = FastAPI(
 
 app.include_router(base_router)
 app.include_router(user_router)
+app.include_router(post_router)
+app.include_router(like_router)
+app.include_router(comment_router)
+app.include_router(follow_router)

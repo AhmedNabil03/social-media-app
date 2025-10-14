@@ -5,3 +5,4 @@ pydantic-settings==2.11.0
 asyncpg==0.30.0
 alembic==1.16.5
 psycopg2==2.9.11
+PyJWT==2.10.1

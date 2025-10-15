@@ -54,7 +54,7 @@ async def signup(data: SignUpRequest, request: Request):
     access_token = create_access_token(user.id)
     return {"access_token": access_token}
 
-##############################################################
+### For Testing: Signup multiple users at once
 from typing import List
 @user_router.post("/signup/multiple")
 async def signup_multiple(users: List[SignUpRequest], request: Request):
@@ -88,7 +88,6 @@ async def signup_multiple(users: List[SignUpRequest], request: Request):
         "created_users": created_users,
         "failed_users": failed_users
     }
-##############################################################
 
 @user_router.post("/login", response_model=TokenResponse)
 async def login(data: LoginRequest, request: Request):
@@ -100,7 +99,6 @@ async def login(data: LoginRequest, request: Request):
     if not user:
         raise HTTPException(401, detail="Invalid credentials")
     
-    # In production, use proper password verification
     if user.hashed_password != data.hashed_password:
         raise HTTPException(401, detail="Invalid credentials")
     
@@ -145,9 +143,6 @@ async def delete_user(current_user = Depends(get_current_user), request: Request
 
 @user_router.post("/logout")
 async def logout(current_user = Depends(get_current_user)):
-    """
-    Logout endpoint - in practice, client removes token
-    This is mainly for logging purposes or blacklisting tokens in production
-    """
+
     logger.info(f"User {current_user['id']} logged out")
     return {"message": "Logged out successfully"}

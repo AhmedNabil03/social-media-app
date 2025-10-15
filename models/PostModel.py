@@ -32,6 +32,21 @@ class PostModel(BaseModel):
         except Exception as e:
             logger.error(f"Error getting post by id: {e}")
             return None
+        
+    async def get_feed_posts(self, user_id: int, limit: int = 10, offset: int = 0) -> list[Post]:
+        try:
+            async with self.db_client() as session:
+                result = await session.execute(
+                    select(Post)
+                    .where(Post.user_id != user_id)
+                    .order_by(Post.created_at.desc())
+                    .limit(limit)
+                    .offset(offset)
+                )
+                return result.scalars().all()
+        except Exception as e:
+            logger.error(f"Error getting feed posts: {e}")
+            return []
     
     async def get_posts_by_user_id(self, user_id: int, limit: int = 10, offset: int = 0) -> list[Post]:
         try:

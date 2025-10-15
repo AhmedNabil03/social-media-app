@@ -75,6 +75,19 @@ async def get_my_posts(
     
     return posts
 
+@post_router.get("/feed")
+async def get_feed_posts(
+    limit: int = Query(20, le=100),
+    offset: int = Query(0, ge=0),
+    current_user = Depends(get_current_user),
+    request: Request = None
+):
+    db_client = request.app.db_client
+    post_model = PostModel(db_client)
+
+    posts = await post_model.get_feed_posts(current_user["id"], limit, offset)
+    return posts
+
 @post_router.delete("/{post_id}")
 async def delete_post(
     post_id: int,

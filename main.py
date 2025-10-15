@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from fastapi.templating import Jinja2Templates
 from contextlib import asynccontextmanager
 from helpers.config import get_settings
 from routes import base_router, user_router, post_router, like_router, comment_router, follow_router
+from routes import web_router
 from models.init_db import create_database, run_migrations
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -9,6 +11,8 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+templates = Jinja2Templates(directory="templates")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,7 +42,7 @@ async def lifespan(app: FastAPI):
     try:
         logger.info("Shutting down application...")
         
-        app.db_engine.dispose()
+        await app.db_engine.dispose()
         
         logger.info("Application shutdown complete")
         
@@ -57,3 +61,4 @@ app.include_router(post_router)
 app.include_router(like_router)
 app.include_router(comment_router)
 app.include_router(follow_router)
+app.include_router(web_router)

@@ -14,7 +14,6 @@ SECRET_KEY = "secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Token blacklist - Redis
 token_blacklist = set()
 
 
@@ -35,7 +34,6 @@ def create_access_token(user_id: int, expires_delta: Optional[timedelta] = None)
 
 
 def verify_token(token: str) -> Optional[int]:
-    """Verify JWT token and return user_id"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: int = int(payload.get("sub"))
@@ -65,13 +63,8 @@ def is_token_blacklisted(token: str) -> bool:
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    """
-    Dependency to get current user from JWT token (for API routes)
-    Expects Bearer token in Authorization header
-    """
     token = credentials.credentials
     
-    # Check if token is blacklisted
     if is_token_blacklisted(token):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -92,10 +85,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 
 
 async def get_current_user_from_cookie(request: Request) -> dict:
-    """
-    Dependency to get current user from cookie (for web routes)
-    Expects access_token in cookies
-    """
     token = request.cookies.get("access_token")
     
     if not token:
@@ -123,10 +112,6 @@ async def get_current_user_from_cookie(request: Request) -> dict:
 
 
 def get_current_user_optional(request: Request) -> Optional[dict]:
-    """
-    Get current user from cookie without raising exception
-    Returns None if not authenticated (for optional auth)
-    """
     token = request.cookies.get("access_token")
     
     if not token:
@@ -143,15 +128,10 @@ def get_current_user_optional(request: Request) -> Optional[dict]:
     return {"id": user_id, "token": token}
 
 
-# Optional: If you want to store user object instead of just ID
 async def get_current_user_with_db(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db_client = None
 ) -> dict:
-    """
-    Get current user from JWT and fetch from database
-    Use this if you need full user details
-    """
     token = credentials.credentials
     user_id = verify_token(token)
     

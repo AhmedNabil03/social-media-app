@@ -7,7 +7,6 @@ class SQLAlchemyBase(DeclarativeBase):
 
 
 class CreatedAtMixin:
-    """Mixin for created_at only"""
     created_at = Column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -16,7 +15,6 @@ class CreatedAtMixin:
 
 
 class TimestampMixin:
-    """Mixin for created_at and updated_at"""
     created_at = Column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -24,7 +22,6 @@ class TimestampMixin:
     )
     updated_at = Column(
         DateTime(timezone=True),
-        server_default=func.now(),
         onupdate=func.now(),
-        nullable=False
+        nullable=True
     )

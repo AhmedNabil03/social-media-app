@@ -17,13 +17,6 @@ async def lifespan(app: FastAPI):
         
         settings = get_settings()
         
-        # logger.info(f"Database host: {settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}")
-
-        # create_database(server_url=settings.SERVER_URL, db_name=settings.POSTGRES_MAIN_DATABASE)
-        # run_migrations(db_url=settings.DATABASE_URL)
-        
-        # logger.info("Application started and database initialized")
-        
         app.db_engine = create_async_engine(settings.DATABASE_ASYNC_URL, echo=False)
         app.db_client = sessionmaker(app.db_engine, class_=AsyncSession, expire_on_commit=False)
         

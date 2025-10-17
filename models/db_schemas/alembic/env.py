@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from models.db_schemas.schemas.social_media_base import SQLAlchemyBase
+from schemas.social_media_base import SQLAlchemyBase
 
 from alembic import context
 

@@ -1,3 +1,4 @@
+.env
+env/*.env
 postgres_data
 fastapi-app/alembic.ini
-!env/*.example

@@ -15,11 +15,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY src/requirements.txt .
 
 RUN uv pip install -r requirements.txt --system
 
-COPY . .
+COPY src/ .
 
 # Create directory structure for Alembic
 RUN mkdir -p /app/models/db_schemas/

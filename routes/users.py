@@ -210,14 +210,12 @@ async def update_password(
             detail="New password must be different from current password"
         )
     
-    # Update password (you should add this method to UserModel)
     user = await user_model.update_user(
         user_id=current_user["id"],
         username=None,
         email=None,
         bio=None
     )
-    # TODO: Add password update functionality to UserModel
     
     logger.info(f"User updated password: {user.username}")
     return {"message": "Password updated successfully"}

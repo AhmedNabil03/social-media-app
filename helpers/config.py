@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_HOST: str
     POSTGRES_PORT: int
-    POSTGRES_MAIN_DATABASE: str
+    POSTGRES_DB: str
     
     # Server configuration
     JWT_SECRET_KEY: str
@@ -22,14 +22,14 @@ class Settings(BaseSettings):
     def DATABASE_URL(self) -> str:
         return (
             f"postgresql://{self.POSTGRES_USERNAME}:{self.POSTGRES_PASSWORD}"
-            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_MAIN_DATABASE}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
     
     @property
     def DATABASE_ASYNC_URL(self) -> str:
         return (
             f"postgresql+asyncpg://{self.POSTGRES_USERNAME}:{self.POSTGRES_PASSWORD}"
-            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_MAIN_DATABASE}"
+            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
     
     @property

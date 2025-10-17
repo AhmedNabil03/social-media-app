@@ -1,4 +1,5 @@
 services:
+  # PostgreSQL Database
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -6,12 +7,40 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_MAIN_DATABASE}
-      POSTGRES_HOST: ${POSTGRES_HOST}
+    env_file:
+      - env/.postgres.env
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  # FastAPI Application
+  app:
+    build:
+      context: ..
+      dockerfile: docker/fastapi-app/Dockerfile
+    container_name: social_media_app
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./env/.app.env
+    volumes:
+      - fastapi_data:/app/assets
+    networks:
+      - backend
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: always
 
 volumes:
   postgres_data:
+  fastapi_data:
+
+networks:
+  backend:
+    driver: bridge

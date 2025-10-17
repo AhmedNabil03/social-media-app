@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 
 security = HTTPBearer()
 
-# JWT configuration
 SECRET_KEY = "secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+# Redis for production
 token_blacklist = set()
 
 
@@ -26,7 +26,8 @@ def create_access_token(user_id: int, expires_delta: Optional[timedelta] = None)
     
     payload = {
         "sub": str(user_id),
-        "exp": expire
+        "exp": expire,
+        "iat": datetime.utcnow()
     }
     
     encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
@@ -46,15 +47,15 @@ def verify_token(token: str) -> Optional[int]:
     except jwt.ExpiredSignatureError:
         logger.error("Token has expired")
         return None
-    except jwt.InvalidTokenError:
-        logger.error("Invalid token")
+    except jwt.InvalidTokenError as e:
+        logger.error(f"Invalid token: {e}")
         return None
 
 
 def blacklist_token(token: str):
     """Add token to blacklist"""
     token_blacklist.add(token)
-    logger.info(f"Token blacklisted")
+    logger.info("Token blacklisted")
 
 
 def is_token_blacklisted(token: str) -> bool:
@@ -63,6 +64,7 @@ def is_token_blacklisted(token: str) -> bool:
 
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+    """Get current user from Authorization header (Bearer token)"""
     token = credentials.credentials
     
     if is_token_blacklisted(token):
@@ -85,6 +87,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 
 
 async def get_current_user_from_cookie(request: Request) -> dict:
+    """Get current user from cookie (for web-based auth)"""
     token = request.cookies.get("access_token")
     
     if not token:
@@ -93,7 +96,6 @@ async def get_current_user_from_cookie(request: Request) -> dict:
             detail="Not authenticated - please login",
         )
     
-    # Check if token is blacklisted
     if is_token_blacklisted(token):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -111,7 +113,7 @@ async def get_current_user_from_cookie(request: Request) -> dict:
     return {"id": user_id, "token": token}
 
 
-def get_current_user_optional(request: Request) -> Optional[dict]:
+async def get_current_user_optional(request: Request) -> Optional[dict]:
     token = request.cookies.get("access_token")
     
     if not token:
@@ -126,28 +128,3 @@ def get_current_user_optional(request: Request) -> Optional[dict]:
         return None
     
     return {"id": user_id, "token": token}
-
-
-async def get_current_user_with_db(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db_client = None
-) -> dict:
-    token = credentials.credentials
-    user_id = verify_token(token)
-    
-    if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # If you need to fetch from DB:
-    # from models.UserModel import UserModel
-    # user_model = UserModel(db_client)
-    # user = await user_model.get_user_by_id(user_id)
-    # if not user:
-    #     raise HTTPException(status_code=404, detail="User not found")
-    # return user
-    
-    return {"id": user_id}

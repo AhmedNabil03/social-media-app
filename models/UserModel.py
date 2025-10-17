@@ -9,14 +9,13 @@ logger = logging.getLogger(__name__)
 
 class UserModel(BaseModel):
     
-    async def create_user(self, username: str, email: str, hashed_password: str, salt: str, bio: str = None) -> User | None:
+    async def create_user(self, username: str, email: str, hashed_password: str, bio: str = None) -> User | None:
         try:
             async with self.db_client() as session:
                 user = User(
                     username=username,
                     email=email,
                     hashed_password=hashed_password,
-                    salt=salt,
                     bio=bio
                 )
                 session.add(user)
@@ -42,6 +41,17 @@ class UserModel(BaseModel):
             logger.error(f"Error getting user by username: {e}")
             return None
     
+    async def get_user_by_email(self, email: str) -> User | None:
+        try:
+            async with self.db_client() as session:
+                result = await session.execute(
+                    select(User).where(User.email == email)
+                )
+                return result.scalar_one_or_none()
+        except Exception as e:
+            logger.error(f"Error getting user by email: {e}")
+            return None
+    
     async def get_user_by_id(self, user_id: int) -> User | None:
         try:
             async with self.db_client() as session:
@@ -49,6 +59,58 @@ class UserModel(BaseModel):
         except Exception as e:
             logger.error(f"Error getting user by id: {e}")
             return None
+    
+    async def get_user_by_uuid(self, user_uuid: str) -> User | None:
+        try:
+            async with self.db_client() as session:
+                result = await session.execute(
+                    select(User).where(User.user_uuid == user_uuid)
+                )
+                return result.scalar_one_or_none()
+        except Exception as e:
+            logger.error(f"Error getting user by uuid: {e}")
+            return None
+    
+    async def update_user(self, user_id: int, username: str = None, email: str = None, bio: str = None) -> User | None:
+        try:
+            async with self.db_client() as session:
+                user = await session.get(User, user_id)
+                if not user:
+                    logger.warning(f"User not found: {user_id}")
+                    return None
+                
+                if username is not None:
+                    user.username = username
+                if email is not None:
+                    user.email = email
+                if bio is not None:
+                    user.bio = bio
+                
+                await session.commit()
+                await session.refresh(user)
+                logger.info(f"User updated: {user_id}")
+                return user
+        except IntegrityError as e:
+            logger.error(f"Username or email already exists: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Error updating user: {e}")
+            return None
+    
+    async def update_password(self, user_id: int, new_hashed_password: str) -> bool:
+        try:
+            async with self.db_client() as session:
+                user = await session.get(User, user_id)
+                if not user:
+                    return False
+                
+                user.hashed_password = new_hashed_password
+                await session.commit()
+                logger.info(f"Password updated for user: {user_id}")
+                return True
+        except Exception as e:
+            logger.error(f"Error updating password: {e}")
+            return False
     
     async def delete_user(self, user_id: int) -> bool:
         try:

@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from helpers.config import get_settings
 from routes import base_router, user_router, post_router, like_router, comment_router, follow_router
-from models.init_db import create_database, run_migrations
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 import logging

@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException, Request, Depends, status
-from pydantic import BaseModel, Field, validator
-from typing import Optional, List
+from typing import List
 from models.UserModel import UserModel
 from helpers.auth import get_current_user, create_access_token, blacklist_token
-from schemas.users import (
+from routes.schemas.users import (
     LoginRequest,
     SignUpRequest,
     TokenResponse,

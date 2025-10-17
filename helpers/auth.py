@@ -1,15 +1,17 @@
 from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from helpers.config import get_settings
 from datetime import datetime, timedelta
 from typing import Optional
 import jwt
 import logging
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 security = HTTPBearer()
 
-SECRET_KEY = "secret_key"
+SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

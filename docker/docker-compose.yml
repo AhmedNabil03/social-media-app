@@ -60,6 +60,15 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --spider -q http://localhost:9090/-/ready || exit 1",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - backend
     command:
@@ -80,10 +89,13 @@ services:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
     env_file:
       - ./env/.grafana.env
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_healthy
     networks:
       - backend
     restart: always

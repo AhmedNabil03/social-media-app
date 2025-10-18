@@ -105,36 +105,38 @@ Once running, visit http://localhost:8000/docs for interactive API documentation
 
 ### Key Endpoints
 
-| Category     | Method | Endpoint                          | Description                 |
-| ------------ | ------ | --------------------------------- | --------------------------- |
-| **Auth**     | POST   | `/api/v1/users/signup`            | Register new user           |
-|              | POST   | `/api/v1/users/login`             | Login and get JWT token     |
-|              | POST   | `/api/v1/users/logout`            | Logout and invalidate token |
-| **Users**    | GET    | `/api/v1/users/profile`           | Get current user profile    |
-|              | PATCH  | `/api/v1/users/profile`           | Update profile              |
-|              | PATCH  | `/api/v1/users/password`          | Update password             |
-|              | GET    | `/api/v1/users/{username}`        | Get public user profile     |
-|              | DELETE | `/api/v1/users/`                  | Delete own account          |
-| **Posts**    | POST   | `/api/v1/posts`                   | Create new post             |
-|              | GET    | `/api/v1/posts/`                  | Get own posts               |
-|              | GET    | `/api/v1/posts/{post_id}`         | Get specific post           |
-|              | GET    | `/api/v1/posts/user/{user_id}`    | Get user's posts            |
-|              | GET    | `/api/v1/posts/feed/all`          | Get feed posts              |
-|              | PATCH  | `/api/v1/posts/{post_id}`         | Update post                 |
-|              | DELETE | `/api/v1/posts/{post_id}`         | Delete post                 |
-| **Comments** | POST   | `/api/v1/comments`                | Create comment (or reply)   |
-|              | GET    | `/api/v1/comments/post/{post_id}` | Get post comments           |
-|              | GET    | `/api/v1/comments/{id}/replies`   | Get comment replies         |
-|              | PATCH  | `/api/v1/comments/{comment_id}`   | Update comment              |
-|              | DELETE | `/api/v1/comments/{comment_id}`   | Delete comment              |
-| **Likes**    | POST   | `/api/v1/likes/post/{post_id}`    | Like a post                 |
-|              | DELETE | `/api/v1/likes/post/{post_id}`    | Unlike a post               |
-|              | POST   | `/api/v1/likes/comment/{id}`      | Like a comment              |
-|              | DELETE | `/api/v1/likes/comment/{id}`      | Unlike a comment            |
-| **Follow**   | POST   | `/api/v1/follow/{user_id}`        | Follow user                 |
-|              | DELETE | `/api/v1/follow/{user_id}`        | Unfollow user               |
-|              | GET    | `/api/v1/follow/followers/{id}`   | Get followers               |
-|              | GET    | `/api/v1/follow/following/{id}`   | Get following               |
+| Category     | Method | Endpoint                                   | Description                      |
+| ------------ | ------ | ------------------------------------------ | -------------------------------- |
+| **Auth**     | POST   | `/api/v1/users/signup`                     | Register new user                |
+|              | POST   | `/api/v1/users/login`                      | Login and get JWT token          |
+|              | POST   | `/api/v1/users/logout`                     | Logout and invalidate token      |
+| **Users**    | GET    | `/api/v1/users/profile`                    | Get current user profile         |
+|              | PATCH  | `/api/v1/users/profile`                    | Update profile                   |
+|              | PATCH  | `/api/v1/users/password`                   | Update password                  |
+|              | GET    | `/api/v1/users/{username}`                 | Get public user profile          |
+|              | DELETE | `/api/v1/users/`                           | Delete own account               |
+| **Posts**    | POST   | `/api/v1/posts`                            | Create new post                  |
+|              | GET    | `/api/v1/posts/`                           | Get own posts                    |
+|              | GET    | `/api/v1/posts/{post_id}`                  | Get specific post                |
+|              | GET    | `/api/v1/posts/user/{user_id}`             | Get user's posts                 |
+|              | GET    | `/api/v1/posts/feed/all`                   | Get feed posts                   |
+|              | PATCH  | `/api/v1/posts/{post_id}`                  | Update post                      |
+|              | DELETE | `/api/v1/posts/{post_id}`                  | Delete post                      |
+| **Comments** | POST   | `/api/v1/comments`                         | Create comment (or reply)        |
+|              | GET    | `/api/v1/comments/post/{post_id}`          | Get post comments                |
+|              | GET    | `/api/v1/comments/{comment_id}/replies`    | Get comment replies              |
+|              | PATCH  | `/api/v1/comments/{comment_id}`            | Update comment                   |
+|              | DELETE | `/api/v1/comments/{comment_id}`            | Delete comment                   |
+| **Likes**    | POST   | `/api/v1/likes/{post_id}`                  | Like a post                      |
+|              | DELETE | `/api/v1/likes/{post_id}`                  | Unlike a post                    |
+|              | GET    | `/api/v1/likes/{post_id}/check`            | Check if user liked post         |
+|              | GET    | `/api/v1/likes/{post_id}/count`            | Get post likes count             |
+| **Follow**   | POST   | `/api/v1/follows/{following_id}`           | Follow user                      |
+|              | DELETE | `/api/v1/follows/{following_id}`           | Unfollow user                    |
+|              | GET    | `/api/v1/follows/{user_id}/check`          | Check if following user          |
+|              | GET    | `/api/v1/follows/stats/{user_id}`          | Get followers & following counts |
+|              | GET    | `/api/v1/follows/user/{user_id}/followers` | Get followers count              |
+|              | GET    | `/api/v1/follows/user/{user_id}/following` | Get following count              |
 
 
 ## 📊 Monitoring & Metrics

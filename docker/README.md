@@ -219,6 +219,4 @@ For production deployment:
 2. **Use secrets management** instead of `.env` files
 3. **Enable HTTPS** with SSL certificates in Nginx
 4. **Set up external backups** for PostgreSQL data
-6. **Use a reverse proxy** (Nginx is already included)
-7. **Monitor disk space** for metrics and logs
- 
+5. **Monitor disk space** for metrics and logs

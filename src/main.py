@@ -4,6 +4,7 @@ from helpers.config import get_settings
 from routes import base_router, user_router, post_router, like_router, comment_router, follow_router
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from utils.metrics import setup_metrics
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -42,6 +43,8 @@ app = FastAPI(
     description="A simple social media application built with FastAPI and PostgreSQL",
     lifespan=lifespan
 )
+
+setup_metrics(app)
 
 app.include_router(base_router)
 app.include_router(user_router)

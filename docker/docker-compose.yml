@@ -1,29 +1,10 @@
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - env/.postgres.env
-    networks:
-      - backend
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: always
-
   # FastAPI Application
   app:
     build:
       context: ..
       dockerfile: docker/fastapi-app/Dockerfile
-    container_name: social_media_app
+    container_name: fastapi
     ports:
       - "8000:8000"
     env_file:
@@ -37,9 +18,117 @@ services:
         condition: service_healthy
     restart: always
 
+  # Nginx Service
+  nginx:
+    image: nginx:stable-alpine3.21-perl
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - backend
+    restart: always
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./env/.postgres.env
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - backend
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
+    restart: always
+    depends_on:
+      - app
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:11.6.0-ubuntu
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    env_file:
+      - ./env/.grafana.env
+    depends_on:
+      - prometheus
+    networks:
+      - backend
+    restart: always
+
+  # Node Exporter
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--no-collector.netstat"
+      - "--no-collector.softnet"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|mnt)($$|/)"
+      - "--collector.filesystem.ignored-fs-types=^(tmpfs|overlay|nsfs|squashfs)$"
+    networks:
+      - backend
+    restart: always
+
+  # PostgreSQL Exporter
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    container_name: postgres-exporter
+    ports:
+      - "9187:9187"
+    env_file:
+      - ./env/.postgres-exporter.env
+    depends_on:
+      - postgres
+    networks:
+      - backend
+    restart: always
+
 volumes:
-  postgres_data:
   fastapi_data:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
 
 networks:
   backend:
